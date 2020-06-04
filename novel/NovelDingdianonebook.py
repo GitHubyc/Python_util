@@ -1,22 +1,24 @@
-#coding=utf-8
+# coding=utf-8
 import requests
 from bs4 import BeautifulSoup
 import codecs
-# import StudyThread
+import threading
 import time
 
 import sys
 import importlib
+
 importlib.reload(sys)
-sys.setdefaultencoding('utf-8')
-#此例为顶点小说爬取
+
+
+# 此例为顶点小说爬取
 
 def one_book(path):
     r = requests.get('http://www.23us.so/xiaoshuo/' + path + '.html')
     soup = BeautifulSoup(r.content, 'html.parser')  # html.parser是解析器
     div = soup.find('div', attrs={'class': 'bdsub'})
     book_info = div.select(' > dl > dd')[1].select(' > div')[1].select('table')[0]
-    brief_introduction = div.select(' > dl > dd')[3].select(' > p')[1]#内容简介
+    brief_introduction = div.select(' > dl > dd')[3].select(' > p')[1]  # 内容简介
 
     book_name = div.select(' > dl > dd')[0].text.split(' ')[0]
     book_type = book_info.select(' > tr')[0].select(' > td')[0].text
@@ -31,7 +33,8 @@ def one_book(path):
     # 根据条件获取书籍信息
     # if int(collection) < 500 or int(Recommend_totle) < 1000:
     #     return
-    print(("第几本：%-5s 名称:%-10s 类别:%-10s 字数:%-10s 收藏数:%-5s 总点击数:%-15s 本月点击:%-15s 本周点击:%-10s 总推荐数:%-10s 本月推荐:%-10s 本周推荐:%-10s 内容简介:%-10s" % (
+    print((
+            "第几本：%-5s 名称:%-10s 类别:%-10s 字数:%-10s 收藏数:%-5s 总点击数:%-15s 本月点击:%-15s 本周点击:%-10s 总推荐数:%-10s 本月推荐:%-10s 本周推荐:%-10s 内容简介:%-10s" % (
         (path),
         (book_name),
         (book_type),
@@ -74,6 +77,7 @@ def one_book(path):
     fo.close()
     print(book_name + '爬取完成！！！')
 
+
 # 为线程定义一个函数
 def print_time(threadName, delay):
     count = 0
@@ -85,10 +89,13 @@ def print_time(threadName, delay):
 
 # 创建线程
 try:
-    # for i in range(10000):
-    #     i = i + 1
-    #     StudyThread.start_new_thread(one_book, (str(i),))
-    one_book('15738')
+    threads = []
+    for i in range(10000):
+        i = i + 1
+        t = threading.Thread(target=print_time, args=(str(i), (str(i))))
+        threads.append(t)
+        t.start()
+    # one_book('15738')
 except:
     print("Error: unable to start thread")
 

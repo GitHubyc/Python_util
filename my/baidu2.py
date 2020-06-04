@@ -28,17 +28,13 @@ def get_url(keyword):
 
 def get_page(url):
     try:
-
         headers = {
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-            'Accept-Encoding': 'gzip, deflate, compress',
-            'Accept-Language': 'en-us;q=0.5,en;q=0.3',
-            'Cache-Control': 'max-age=0',
-            'Connection': 'keep-alive',
-            'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:22.0) Gecko/20100101 Firefox/22.0'
-        }  # 定义头文件，伪装成浏览器
-
-        response = requests.get(url,headers=headers)
+            'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36',
+            'accept-language': 'zh-CN,zh;q=0.9',
+            'cache-control': 'max-age=0',
+            'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8'
+        }
+        response = requests.get(url=url,headers=headers)
         # 更改编码方式，否则会出现乱码的情况
         response.encoding = "utf-8"
         print(response.status_code)
@@ -52,7 +48,7 @@ def get_page(url):
 def parse_page(url,page):
 
     for i in range(1,int(page)+1):
-        print(("正在爬取第{}页....".format(i)))
+        print("正在爬取第{}页....".format(i))
         title = ""
         sub_url = ""
         abstract = ""
@@ -95,8 +91,8 @@ def parse_page(url,page):
             yield data
 
 def main():
-    keyword = eval(input("输入关键字:"))
-    page = eval(input("输入查找页数:"))
+    keyword = input("输入关键字:")
+    page = input("输入查找页数:")
     url = get_url(keyword)
 
     results = parse_page(url,page)

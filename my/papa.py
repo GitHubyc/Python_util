@@ -21,7 +21,7 @@ for title,img,link in zip(titles,imgs,links):
     print(data)
 
     x = 1
-    print((data.get('link')))
+    print(data.get('link'))
     image_name = '%s.mp4' % x
     urllib.request.urlretrieve(data.get('link'),image_name)
     x+=1

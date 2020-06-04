@@ -1,12 +1,42 @@
 # coding=utf-8
-import urllib.request, urllib.parse, urllib.error
-import _thread
-import re
-import requests
-from time import ctime
+import urllib.error
+import urllib.parse
+import urllib.request
+
 from bs4 import BeautifulSoup
 
-sum = 0;
+
+def rate(code):
+    # 获取基金买入费率
+    site = 'http://fundf10.eastmoney.com/jjfl_' + code + '.html'
+    html = urllib.request.urlopen(site)
+    soup = BeautifulSoup(html, 'html.parser')
+    rate = soup.select('#bodydiv')[0].select('.mainFrame')[7].select('.right')[0].select('.basic-new ')[0].select(
+        '.bs_jz')[0].select('.col-right')[0].select('p')[2].select('b')[1].text
+
+    # print(soup.select('body script')[1])
+    # titles = soup.select("body  script")  # CSS 选择器
+    # print(titles)
+    # i = 1
+    # for title in titles:
+    #     if i == 3:
+    #         # print(title.get_text())# 标签体、标签属性
+    #         str = title.get_text()
+    #         break
+    #     if i == 2:
+    #         i = 3
+    #     if i == 1:
+    #         i = 2
+    #
+    # print(str)
+    # str1 = "\"\"\"" + "<script>" + str + "</script>" + "\"\"\""
+    # soup = BeautifulSoup(str1, "html.parser")
+    # pattern = re.compile(r"var _url = '(.*?)';$", re.MULTILINE | re.DOTALL)
+    # script = soup.find("script", text=pattern)
+    # # print (pattern.search(script.text).string)
+    # s = pattern.search(script.text).string
+    # print(s.split('\'')[11])
+    return rate
 
 
 def getMoney(code, money):
@@ -32,74 +62,63 @@ def getMoney(code, money):
         1].text.replace('+', '').replace('', '').replace('%', '')
 
     global sum
-    if addtrue != '':
-        add = addtrue
+    # if addtrue != '':
+    #     add = addtrue
     profit = float(add) * float(money)
-    profit1 = '.'.join(str(profit).split('.')[:1])
     if len(name) > 10:
         name = name + '\t'
     if len(name) > 13:
         name = name + '\t'
-    print((
-            '{code:<{len1}}\t' + '{name:<{len2}}\t' + '{money:<{len3}}\t' + '{add:<{len4}}\t' + '{profit:<{len5}}\t').format(
-        code=code,
-        len1=6, name=name,
-        len2=30 - len(
-            name.encode(
-                'GBK')) + len(
-            name),
-        money=money,
-        len3=12,
-        add=add,
-        len4=10 - len(
-            add.encode(
-                'GBK')) + len(
-            add),
-        profit=profit1,
-        len5=20))
+    printmethon(code, name, money, '.'.join(str(profit).split('.')[:1]), add, rate(code))
     sum = profit + sum
     # 累加各基金收益
 
 
-def getAll():
-    codes = ['320007', '000248', '005224', '519674', '008282', '001644', '001579', '161028', '003096']
-    moneys = ['304.35', '144.65', '99.43', '99.91', '79.94', '77.27', '62.53', '31.70', '31.59']
-
-    code = '编码'
-    name = '名称'
-    money = '持有(百)'
-    profit = '收益(元)'
-    add = '涨跌幅(%)'
-
+def printmethon(code, name, money, profit, add, rate):
     print((
-            '{code:<{len1}}\t' + '{name:<{len2}}\t' + '{money:<{len3}}\t' + '{add:<{len4}}\t' + '{profit:<{len5}}\t').format(
+            '{code:<{len1}}\t' + '{name:<{len2}}\t' + '{money:<{len3}}\t' + '{add:<{len4}}\t' + '{profit:<{len5}}\t' + '{rate:<{len6}}\t').format(
         code=code,
-        len1=6, name=name,
+        len1=20, name=name,
         len2=30 - len(
             name.encode(
                 'GBK')) + len(
             name),
         money=money,
-        len3=12,
+        len3=20,
         add=add,
-        len4=10 - len(
+        len4=5 - len(
             add.encode(
                 'GBK')) + len(
             add),
         profit=profit,
-        len5=20))
-    for i in range(0, len(codes)):
-        getMoney(codes[i], moneys[i])
-    print('今日收益：' + str(sum))
+        len5=20, rate=rate,
+        len6=20))
 
 
-def getA():
-    site = 'http://favor.fund.eastmoney.com/'
-    html = urllib.request.urlopen(site)
-    soup = BeautifulSoup(html, 'html.parser')
+def statisic():
+    code = '编码'
+    name = '名称'
+    money = '持有'
+    profit = '收益'
+    add = '涨跌幅'
+    rate = '买入/卖出费率'
+    printmethon(code, name, money, profit, add, rate)
 
-    print(soup.select('#quotePanel')[0].select('.em-grids')[0].select('.em-grid-20')[0].select('#quotePanel')[0])
+    fund = [
+        {'code': '320007', 'money': 304.35, 'name': ''},
+        {'code': '000248', 'money': 144.65, 'name': ''},
+        {'code': '005224', 'money': 99.43, 'name': ''},
+        {'code': '519674', 'money': 99.91, 'name': ''},
+        {'code': '008282', 'money': 79.94, 'name': ''},
+        {'code': '001644', 'money': 77.27, 'name': ''},
+        {'code': '001579', 'money': 62.53, 'name': ''},
+        {'code': '161028', 'money': 31.70, 'name': ''},
+        {'code': '003096', 'money': 31.59, 'name': ''}]
+    fund = sorted(fund, key=lambda tm: (tm["money"]), reverse=True)
+    for i in range(0, len(fund)):
+        getMoney(fund[i].get('code'), fund[i].get('money'))
+    print('总收益：' + str(sum))
 
 
-# getA()
-getAll()
+sum = 0
+statisic()

@@ -1,3 +1,4 @@
+#coding=gbk;
 import requests
 
 import urllib.parse
@@ -10,7 +11,7 @@ from lxml import etree
 import re
 import json
 
-# ç™¾åº¦æœç´¢æ¥å£
+# °Ù¶ÈËÑË÷½Ó¿Ú
 
 def format_url(url, params: dict=None) -> str:
     query_str = urllib.parse.urlencode(params)
@@ -28,18 +29,14 @@ def get_url(keyword):
 
 def get_page(url):
     try:
-
         headers = {
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-            'Accept-Encoding': 'gzip, deflate, compress',
-            'Accept-Language': 'en-us;q=0.5,en;q=0.3',
-            'Cache-Control': 'max-age=0',
-            'Connection': 'keep-alive',
-            'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:22.0) Gecko/20100101 Firefox/22.0'
-        }  # å®šä¹‰å¤´æ–‡ä»¶ï¼Œä¼ªè£…æˆæµè§ˆå™¨
-
-        response = requests.get(url,headers=headers)
-        # æ›´æ”¹ç¼–ç æ–¹å¼ï¼Œå¦åˆ™ä¼šå‡ºç°ä¹±ç çš„æƒ…å†µ
+            'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36',
+            'accept-language': 'zh-CN,zh;q=0.9',
+            'cache-control': 'max-age=0',
+            'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8'
+        }
+        response = requests.get(url=url,headers=headers)
+        # ¸ü¸Ä±àÂë·½Ê½£¬·ñÔò»á³öÏÖÂÒÂëµÄÇé¿ö
         response.encoding = "utf-8"
         print(response.status_code)
         # print(response.text)
@@ -52,7 +49,7 @@ def get_page(url):
 def parse_page(url,page):
 
     for i in range(1,int(page)+1):
-        print(("æ­£åœ¨çˆ¬å–ç¬¬{}é¡µ....".format(i)))
+        print("ÕıÔÚÅÀÈ¡µÚ{}Ò³....".format(i))
         title = ""
         sub_url = ""
         abstract = ""
@@ -90,21 +87,23 @@ def parse_page(url,page):
             if rel_url:
                 url = urljoin(url, rel_url[0])
             else:
-                print("æ— æ›´å¤šé¡µé¢ï¼ï½")
+                print("ÎŞ¸ü¶àÒ³Ãæ£¡¡«")
                 return
             yield data
 
 def main():
-    keyword = eval(input("è¾“å…¥å…³é”®å­—:"))
-    page = eval(input("è¾“å…¥æŸ¥æ‰¾é¡µæ•°:"))
+    keyword = input("ÊäÈë¹Ø¼ü×Ö:")
+    page = input("ÊäÈë²éÕÒÒ³Êı:")
     url = get_url(keyword)
 
     results = parse_page(url,page)
-    # å†™å…¥æ–‡ä»¶
+    # Ğ´ÈëÎÄ¼ş
     file = open("data.json", 'w+', encoding='utf-8')
     for result in results:
         print(result)
         file.write(json.dumps(result, indent=2, ensure_ascii=False))
+        file.flush()
 
 if __name__ == '__main__':
     main()
+

@@ -14,32 +14,10 @@ def rate(code):
     rate = soup.select('#bodydiv')[0].select('.mainFrame')[7].select('.right')[0].select('.basic-new ')[0].select(
         '.bs_jz')[0].select('.col-right')[0].select('p')[2].select('b')[1].text
 
-    # print(soup.select('body script')[1])
-    # titles = soup.select("body  script")  # CSS 选择器
-    # print(titles)
-    # i = 1
-    # for title in titles:
-    #     if i == 3:
-    #         # print(title.get_text())# 标签体、标签属性
-    #         str = title.get_text()
-    #         break
-    #     if i == 2:
-    #         i = 3
-    #     if i == 1:
-    #         i = 2
-    #
-    # print(str)
-    # str1 = "\"\"\"" + "<script>" + str + "</script>" + "\"\"\""
-    # soup = BeautifulSoup(str1, "html.parser")
-    # pattern = re.compile(r"var _url = '(.*?)';$", re.MULTILINE | re.DOTALL)
-    # script = soup.find("script", text=pattern)
-    # # print (pattern.search(script.text).string)
-    # s = pattern.search(script.text).string
-    # print(s.split('\'')[11])
     return rate
 
 
-def getMoney(code, money):
+def getMoney(code, name, money, currentprofit):
     site = 'http://fund.eastmoney.com/' + code + '.html?spm=search'
     html = urllib.request.urlopen(site)
     soup = BeautifulSoup(html, 'html.parser')
@@ -69,55 +47,71 @@ def getMoney(code, money):
         name = name + '\t'
     if len(name) > 13:
         name = name + '\t'
-    printmethon(code, name, money, '.'.join(str(profit).split('.')[:1]), add, rate(code))
+    printmethon(code, name, rate(code), str(money), '.'.join(str(profit).split('.')[:1]), str(add), str(currentprofit),
+                str(currentprofit + float(add))[0:4])
     sum = profit + sum
     # 累加各基金收益
 
 
-def printmethon(code, name, money, profit, add, rate):
+def printmethon(code, name, rate, money, profit, add, currentprofit, todayprofit):
     print((
-            '{code:<{len1}}\t' + '{name:<{len2}}\t' + '{money:<{len3}}\t' + '{add:<{len4}}\t' + '{profit:<{len5}}\t' + '{rate:<{len6}}\t').format(
+            '{code:<{len1}}\t' + '{name:<{len2}}\t' + '{rate:<{len3}}\t' + '{money:<{len4}}\t' + '{add:<{len5}}\t' + '{profit:<{len6}}\t' + '{currentprofit:<{len7}}\t' + '{todayprofit:<{len8}}\t').format(
         code=code,
-        len1=20, name=name,
+        len1=10, name=name,
         len2=30 - len(
             name.encode(
                 'GBK')) + len(
-            name),
+            name), rate=rate,
+        len3=5 - len(
+            rate.encode(
+                'GBK')) + len(
+            rate),
         money=money,
-        len3=20,
+        len4=15 - len(
+            money.encode(
+                'GBK')) + len(
+            money),
         add=add,
-        len4=5 - len(
+        len5=5 - len(
             add.encode(
                 'GBK')) + len(
             add),
         profit=profit,
-        len5=20, rate=rate,
-        len6=20))
+        len6=5 - len(
+            profit.encode(
+                'GBK')) + len(
+            profit), currentprofit=currentprofit,
+        len7=5 - len(
+            currentprofit.encode(
+                'GBK')) + len(
+            currentprofit), todayprofit=todayprofit,
+        len8=20))
 
 
 def statisic():
     code = '编码'
     name = '名称'
+    rate = '买入卖出'
     money = '持有'
     profit = '收益'
     add = '涨跌幅'
-    rate = '买入/卖出费率'
-    printmethon(code, name, money, profit, add, rate)
+    currentprofit = '当前收益'
+    todayprofit = '累计今日'
+    printmethon(code, name, rate, money, profit, add, currentprofit, todayprofit)
 
     fund = [
-        {'code': '320007', 'money': 304.35, 'name': ''},
-        {'code': '000248', 'money': 144.65, 'name': ''},
-        {'code': '005224', 'money': 99.43, 'name': ''},
-        {'code': '519674', 'money': 99.91, 'name': ''},
-        {'code': '008282', 'money': 79.94, 'name': ''},
-        {'code': '001644', 'money': 77.27, 'name': ''},
-        {'code': '001579', 'money': 62.53, 'name': ''},
-        {'code': '161028', 'money': 31.70, 'name': ''},
-        {'code': '003096', 'money': 31.59, 'name': ''}]
+        {'code': '320007', 'money': 355.53, 'name': '诺安', 'currentprofit': 0.37},
+        {'code': '000248', 'money': 116, 'name': '汇添富消费', 'currentprofit': 3.29},
+        {'code': '001644', 'money': 107.17, 'name': '汇丰晋信智造', 'currentprofit': 8.08},
+        {'code': '519674', 'money': 100, 'name': '银河', 'currentprofit': -1.02},
+        {'code': '005224', 'money': 98.75, 'name': '基建', 'currentprofit': -1.31},
+        {'code': '001579', 'money': 82.12, 'name': '农业', 'currentprofit': 2.76},
+        {'code': '008282', 'money': 81.38, 'name': '半导体', 'currentprofit': 0.63},
+        {'code': '003096', 'money': 12, 'name': '医疗', 'currentprofit': 1.54}]
     fund = sorted(fund, key=lambda tm: (tm["money"]), reverse=True)
     for i in range(0, len(fund)):
-        getMoney(fund[i].get('code'), fund[i].get('money'))
-    print('总收益：' + str(sum))
+        getMoney(fund[i].get('code'), fund[i].get('name'), fund[i].get('money'), fund[i].get('currentprofit'))
+    print('总收益：' + str(int(sum)))
 
 
 sum = 0

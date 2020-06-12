@@ -4,7 +4,7 @@ import xlwt
 import sys
 import importlib
 importlib.reload(sys)
-sys.setdefaultencoding("utf-8")
+# sys.setdefaultencoding("utf-8")
 import urllib.request, urllib.error, urllib.parse
 import re
 import time

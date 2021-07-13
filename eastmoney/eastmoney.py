@@ -28,7 +28,7 @@ def getMoney(code, name, money, currentprofit):
             '.fundDetail-header')[
             0].select('.fundDetail-tit')[0].select('div')[0].text
     name = '('.join(name.split('(')[:1])
-    # 获取基金统计区域
+    # 获取基金统计区
     item = \
         soup.select('.wrapper')[8].select('.wrapper_min')[0].select('.merchandiseDetail')[0].select('.fundDetail-main')[
             0].select('.fundInfoItem')[0]
